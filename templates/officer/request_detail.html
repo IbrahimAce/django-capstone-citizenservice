@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Process Request — CitizenService{% endblock %}
+
+{% block content %}
+<a href="{% url 'officer_dashboard' %}" class="text-sm text-blue-600 hover:underline mb-4 inline-block">
+    ← Back to Workspace
+</a>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800">{{ sreq.title }}</h1>
+                    <p class="text-gray-400 text-sm mt-0.5">{{ sreq.category.name }}</p>
+                </div>
+                {% if sreq.status == 'pending' %}
+                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">Pending</span>
+                {% elif sreq.status == 'in_review' %}
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">In Review</span>
+                {% elif sreq.status == 'approved' %}
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">Approved</span>
+                {% elif sreq.status == 'rejected' %}
+                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">Rejected</span>
+                {% elif sreq.status == 'completed' %}
+                    <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">Completed</span>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+                <div>
+                    <span class="text-gray-400">Citizen</span>
+                    <p class="font-medium text-gray-700 mt-0.5">{{ sreq.citizen.username }}</p>
+                </div>
+                <div>
+                    <span class="text-gray-400">Priority</span>
+                    <p class="font-medium text-gray-700 capitalize mt-0.5">{{ sreq.priority }}</p>
+                </div>
+                <div>
+                    <span class="text-gray-400">Submitted</span>
+                    <p class="font-medium text-gray-700 mt-0.5">{{ sreq.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+
+            <div>
+                <span class="text-gray-400 text-sm">Description</span>
+                <p class="text-gray-700 mt-1 text-sm leading-relaxed">{{ sreq.description }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="bg-gray-50 rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="font-bold text-gray-800 mb-4">Update Status</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:border-blue-500">
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if sreq.status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Internal Notes</label>
+                    <textarea name="notes" rows="4" 
+                              class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:border-blue-500"
+                              placeholder="Reason for rejection, progress notes, etc...">{{ sreq.notes }}</textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-700 text-white py-2.5 rounded-lg hover:bg-blue-800 font-medium text-sm transition-colors">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
