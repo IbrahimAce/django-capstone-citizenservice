@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import ServiceRequest
+from .models import ServiceRequest, RequestAudit
 
 def officer_required(view_func):
     """
@@ -45,11 +45,16 @@ def request_detail(request, pk):
     sreq = get_object_or_404(ServiceRequest, pk=pk)
 
     if request.method == 'POST':
+        old_status = sreq.status  # Capture the current status before changing it
         new_status = request.POST.get('status')
         notes = request.POST.get('notes')
 
-        if new_status:
+        status_changed = False
+
+        if new_status and new_status != old_status:
             sreq.status = new_status
+            status_changed = True
+            
         if notes is not None:
             sreq.notes = notes
 
@@ -58,10 +63,22 @@ def request_detail(request, pk):
             sreq.assigned_officer = request.user
 
         sreq.save()
-        messages.success(request, 'Request updated successfully.')
+
+        # Generate the Audit Trail record if the status changed
+        if status_changed:
+            RequestAudit.objects.create(
+                service_request=sreq,
+                actor=request.user,
+                old_status=old_status,
+                new_status=new_status,
+                action_note="Status updated via Officer Portal"
+            )
+
+        messages.success(request, 'Request updated and logged successfully.')
         return redirect('officer_request_detail', pk=sreq.pk)
 
     return render(request, 'officer/request_detail.html', {
         'sreq': sreq,
-        'status_choices': ServiceRequest.STATUS_CHOICES
+        'status_choices': ServiceRequest.STATUS_CHOICES,
+        'audit_logs': sreq.audit_logs.all()  # Pass the logs to the template
     })

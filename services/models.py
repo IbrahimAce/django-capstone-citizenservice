@@ -95,3 +95,31 @@ class ServiceRequest(models.Model):
 
     def __str__(self):
         return f"[{self.status.upper()}] {self.title} — {self.citizen.username}"
+
+class RequestAudit(models.Model):
+    """
+    Tracks every status change for full accountability.
+    If a citizen asks "why was this delayed?", the audit trail shows exactly
+    which officer handled it and when.
+    """
+    service_request = models.ForeignKey(
+        ServiceRequest, 
+        on_delete=models.CASCADE, 
+        related_name='audit_logs'
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="The officer or citizen who made the change"
+    )
+    old_status = models.CharField(max_length=20, choices=ServiceRequest.STATUS_CHOICES)
+    new_status = models.CharField(max_length=20, choices=ServiceRequest.STATUS_CHOICES)
+    action_note = models.CharField(max_length=255, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']  # Newest events at the top
+
+    def __str__(self):
+        return f"{self.service_request.title} | {self.old_status} -> {self.new_status}"
