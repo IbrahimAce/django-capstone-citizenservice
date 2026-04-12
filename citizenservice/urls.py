@@ -1,36 +1,22 @@
-"""
-URL configuration for citizenservice project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    # Django admin panel
     path('admin/', admin.site.urls),
 
-    # Authentication endpoints (register, profile)
+    # Homepage
+    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+
+    # Auth (API)
     path('api/auth/', include('users.urls')),
-
-    # Service request endpoints (requests, categories)
     path('api/', include('services.urls')),
-
-    # JWT token endpoints
-    # POST /api/token/         → login, returns access + refresh token
-    # POST /api/token/refresh/ → swap refresh token for a new access token
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    # Web portals (we add these in the next phases)
+    path('', include('users.web_urls')),       # login, register, logout
+    path('citizen/', include('services.citizen_urls')),  # citizen portal
+    path('officer/', include('services.officer_urls')),  # officer portal
 ]

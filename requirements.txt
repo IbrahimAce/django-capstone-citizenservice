@@ -5,3 +5,5 @@ django-filter>=25.0
 python-dotenv>=1.0
 gunicorn>=21.0
 pillow>=10.0
+django-htmx>=1.17
+reportlab>=4.0

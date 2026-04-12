@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
+    'django_htmx',
     # Our project apps
     'users',
     'services',
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,7 +67,7 @@ ROOT_URLCONF = 'citizenservice.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -181,3 +183,19 @@ CACHES = {
 # CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 # CELERY_ACCEPT_CONTENT = ['json']
 # CELERY_TASK_SERIALIZER = 'json'
+
+# --- EMAIL (Gmail SMTP) ---
+# App Password setup: Google Account → Security → 2FA → App Passwords
+# Set these in .env — never hardcode credentials here
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # prints to terminal for now
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'noreply@citizenservice.com')
+
+# --- LOGIN/LOGOUT REDIRECTS ---
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/citizen/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'
