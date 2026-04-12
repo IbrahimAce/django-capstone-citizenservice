@@ -1,0 +1,15 @@
+<!--
+    Reusable status badge — included with {% include "partials/status_badge.html" with status=request.status %}
+    Adding a new status? Add a matching color class here.
+-->
+{% if status == 'pending' %}
+    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">Pending</span>
+{% elif status == 'in_review' %}
+    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">In Review</span>
+{% elif status == 'approved' %}
+    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">Approved</span>
+{% elif status == 'rejected' %}
+    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">Rejected</span>
+{% elif status == 'completed' %}
+    <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium">Completed</span>
+{% endif %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Request Details — CitizenService{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+
+    <!-- Back link -->
+    <a href="{% url 'citizen_dashboard' %}" class="text-sm text-blue-600 hover:underline mb-4 inline-block">
+        ← Back to Dashboard
+    </a>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">{{ request.title }}</h1>
+                <p class="text-gray-400 text-sm mt-0.5">{{ request.category.name }}</p>
+            </div>
+            {% include "partials/status_badge.html" with status=request.status %}
+        </div>
+
+        <!-- Details grid -->
+        <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+            <div>
+                <span class="text-gray-400">Priority</span>
+                <p class="font-medium text-gray-700 capitalize mt-0.5">{{ request.priority }}</p>
+            </div>
+            <div>
+                <span class="text-gray-400">Submitted</span>
+                <p class="font-medium text-gray-700 mt-0.5">{{ request.created_at|date:"M d, Y" }}</p>
+            </div>
+            <div>
+                <span class="text-gray-400">Last Updated</span>
+                <p class="font-medium text-gray-700 mt-0.5">{{ request.updated_at|date:"M d, Y" }}</p>
+            </div>
+            <div>
+                <span class="text-gray-400">Assigned Officer</span>
+                <p class="font-medium text-gray-700 mt-0.5">
+                    {{ request.assigned_officer.username|default:"Not yet assigned" }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-6">
+            <span class="text-gray-400 text-sm">Description</span>
+            <p class="text-gray-700 mt-1 text-sm leading-relaxed">{{ request.description }}</p>
+        </div>
+
+        <!-- Officer notes — only shown if there are any -->
+        {% if request.notes %}
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+            <span class="text-blue-700 text-sm font-medium">Officer Notes</span>
+            <p class="text-blue-800 mt-1 text-sm">{{ request.notes }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
