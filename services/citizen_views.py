@@ -83,5 +83,5 @@ def request_detail(request, pk):
         citizen=request.user  # This is what stops citizens viewing each other's requests
     )
     return render(request, 'citizen/request_detail.html', {
-        'request': service_request
+        'sreq': service_request
     })
